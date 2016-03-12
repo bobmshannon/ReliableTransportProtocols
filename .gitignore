@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+# Vagrant
+.vagrant/
+
+# DS_Store
+.DS_Store
