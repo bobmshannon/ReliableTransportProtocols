@@ -28,4 +28,6 @@ int checksum(struct pkt packet);
  */
 pkt make_pkt(int seqnum, int acknum, char data[]);
 
+bool is_corrupt(struct pkt packet);
+
 #endif

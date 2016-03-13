@@ -1,41 +1,42 @@
-#ifndef SIMULATOR_H_
-#define SIMULATOR_H_
+#ifndef ABT_H_
+#define ABT_H_
 
-#define BIDIRECTIONAL 0
+#include "../include/simulator.h"
+#include <queue>
 
-/* a "msg" is the data unit passed from layer 5 (teachers code) to layer  */
-/* 4 (students' code).  It contains the data (characters) to be delivered */
-/* to layer 5 via the students transport level protocol entities.         */
-struct msg {
-  char data[20];
-};
+/**
+ * Whether the most recently sent packet has been ACKed or not
+ */
+bool is_acked;
 
-/* a packet is the data unit passed from layer 4 (students code) to layer */
-/* 3 (teachers code).  Note the pre-defined packet structure, which all   */
-/* students must follow. */
-struct pkt {
-   int seqnum;
-   int acknum;
-   int checksum;
-   char payload[20];
-};
+/**
+ * The sequence number to use for outbound packets
+ */
+int current_seq_no;
 
-/* Implementation framework interface */
-void A_output(struct msg message);
-void B_output(struct msg message);
-void A_input(struct pkt packet);
-void A_timerinterrupt();
-void A_init();
+/**
+ * Queued outbound messages from application
+ */
+std::queue<struct msg> msg_queue;
 
-void B_input(struct pkt packet);
-void B_init();
+/**
+ * Buffer sent but unACKed packets
+ */
+struct pkt pkt_buf;
 
-/* Simulator API */
-void starttimer(int AorB, float increment);
-void stoptimer(int AorB);
-void tolayer3(int AorB, struct pkt packet);
-void tolayer5(int AorB, char datasent[]);
-int getwinsize();
-float get_sim_time();
+/**
+ * Alternate between 0 and 1
+ * 
+ * @param  n the number to alternate, either 0 or 1
+ * @return   0 or 1 depending on input
+ */
+int alternate_num(int n);
+
+/**
+ * Packetize and send all queued messages
+ */
+void clear_msg_queue();
+
+void send_pkt(int caller, struct pkt packet);
 
 #endif
