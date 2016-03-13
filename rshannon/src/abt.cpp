@@ -127,13 +127,13 @@ void clear_msg_queue() {
  * @return        an integer checksum
  */
 int checksum(struct pkt packet) {
-  int checksum, i = 0;
+  int i = 0, checksum = 0;
   packet.checksum = 0;
 
   char *data = (char *)&packet;
 
   while (i < PACKET_LEN) {
-  	checksum += checksum + (int)data[i];
+  	checksum += (int)data[i];
   	i++;
   }
 
