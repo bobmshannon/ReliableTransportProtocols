@@ -15,6 +15,11 @@ bool is_acked;
 int current_seq_no;
 
 /**
+ * The last received sequence number on the receiver side
+ */
+int last_recv_seq_no;
+
+/**
  * Queued outbound messages from application
  */
 std::queue<struct msg> msg_queue;
@@ -23,6 +28,11 @@ std::queue<struct msg> msg_queue;
  * Buffer sent but unACKed packets
  */
 struct pkt pkt_buf;
+
+/**
+ * Number of packets sent (ignoring any resends due to timeouts)
+ */
+int num_pkts_sent;
 
 /**
  * Alternate between 0 and 1

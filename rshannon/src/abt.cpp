@@ -17,7 +17,7 @@
      (although some can be lost).
 **********************************************************************/
 
-#define DEBUG_MODE 0 // Whether debugging mode is enabled or disabled
+#define DEBUG_MODE 1 // Whether debugging mode is enabled or disabled
 #define DEBUG(x)                                                               \
   do {                                                                         \
     if (DEBUG_MODE) {                                                          \
@@ -25,7 +25,7 @@
     }                                                                          \
   } while (0) // http://stackoverflow.com/questions/14251038/debug-macros-in-c
 
-#define TIMER_INTERVAL 20.0 // Trigger timer interrupt every X time units
+#define TIMER_INTERVAL 10.0 // Trigger timer interrupt every X time units
 
 /**
  * Alternate a single sequence or ack number between
@@ -79,21 +79,28 @@ pkt make_pkt(int seqnum, int acknum, struct msg message) {
   return packet;
 }
 
+/**
+ * Send a packet.
+ * @param caller the sender, 0 for A, 1 for B
+ * @param packet the packet to send
+ */
 void send_pkt(int caller, struct pkt packet) {
-  // Send packet to B
-  tolayer3(0, packet);
+  // Send packet to receiver
+  tolayer3(caller, packet);
   DEBUG("sender: packet sent | seq " << packet.seqnum);
   is_acked = false;
   // Buffer packet so that it can be re-sent if not ACKed by receiver
   pkt_buf = packet;
   // Start timer
-  starttimer(0, TIMER_INTERVAL);
+  starttimer(caller, TIMER_INTERVAL);
 }
 
 /**
  * Add message to outbound queue
+ * @param message the message to queue
  */
 void queue_msg(struct msg message) {
+	DEBUG("message added to queue");
 	msg_queue.push(message);
 }
 
@@ -102,6 +109,7 @@ void queue_msg(struct msg message) {
  */
 void clear_msg_queue() {
 	if(!msg_queue.empty()) {
+		DEBUG("popping message from queue and sending...");
 		// Construct packet
 		struct pkt packet = make_pkt(current_seq_no, 0, msg_queue.front());
 		msg_queue.pop();
@@ -147,7 +155,7 @@ int checksum(struct pkt packet) {
  */
 void A_output(struct msg message) {
   if(!is_acked) {
-  	queue_msg(message);
+  	DEBUG("still waiting for an ACK but received message from receiver, dropping message...");
   	return;
   }
   // Construct packet
@@ -155,6 +163,8 @@ void A_output(struct msg message) {
   DEBUG("sender: packet constructed | " << "packet size: " << sizeof(packet) << " | checksum: " << packet.checksum);
   // Send packet
   send_pkt(0, packet);
+  num_pkts_sent += 1;
+  DEBUG("sender: sent " << num_pkts_sent << " packets thus far");
 }
 
 /**
@@ -201,6 +211,7 @@ void A_timerinterrupt() {
  */
 void A_init() {
 	current_seq_no = 0;
+	num_pkts_sent = 0;
 	is_acked = true;
 }
 
@@ -214,8 +225,14 @@ void B_input(struct pkt packet) {
 		DEBUG("receiver: packet received but corrupted");
 		return;
 	}
-	// Deliver message to application
-	tolayer5(1, packet.payload);
+	if(packet.seqnum == last_recv_seq_no) {
+		DEBUG("receiver: duplicate packet detected, dropping but sending ACK anyways...");
+	} else {
+		// Update last received sequence number
+		last_recv_seq_no = packet.seqnum;
+		// Deliver message to application
+		tolayer5(1, packet.payload);
+	}
 	// Construct ACK packet
 	struct msg message = {};
 	struct pkt ack = make_pkt(0, packet.seqnum, message);
@@ -226,4 +243,6 @@ void B_input(struct pkt packet) {
 
 /* the following rouytine will be called once (only) before any other */
 /* entity B routines are called. You can use it to do any initialization */
-void B_init() {}
+void B_init() {
+	last_recv_seq_no = -1;
+}
