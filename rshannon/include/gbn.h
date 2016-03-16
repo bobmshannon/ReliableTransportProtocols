@@ -17,13 +17,13 @@
 
  /**
   * Buffer containing all packets ready to be sent out
-  * once within the window size.
+  * as soon as they are within the send window.
   */
  std::deque<struct pkt> unsent_buf;
 
  /**
   * Fire timer every X time units. This is a function
-  * of the window size -- t_interval = 5 * window_size;
+  * of the window size -- timer_interval = 5 * window_size
   */
  float timer_interval;
 
