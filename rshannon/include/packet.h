@@ -17,6 +17,7 @@
  * @return        an integer checksum
  */
 int checksum(struct pkt packet);
+bool is_corrupt(struct pkt packet);
 
 /**
  * Construct a packet.
@@ -27,7 +28,7 @@ int checksum(struct pkt packet);
  * @return        a packet with calculated checksum
  */
 pkt make_pkt(int seqnum, int acknum, char data[]);
+void send_pkt(int caller, struct pkt packet);
 
-bool is_corrupt(struct pkt packet);
 
 #endif

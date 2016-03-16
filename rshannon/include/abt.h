@@ -46,7 +46,4 @@ int alternate_num(int n);
  * Packetize and send all queued messages
  */
 void clear_msg_queue();
-
-void send_pkt(int caller, struct pkt packet);
-
 #endif
