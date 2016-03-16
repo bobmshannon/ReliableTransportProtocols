@@ -1,5 +1,5 @@
-#ifndef ABT_H_
-#define ABT_H_
+#ifndef GBN_H_
+#define GBN_H_
 
 #include "../include/simulator.h"
 #include <queue>
