@@ -139,6 +139,8 @@ void A_input(struct pkt packet)
 		struct pkt packet = unsent_buf.front();
 		unsent_buf.pop_front();
 		send_pkt(0, packet);
+		// Buffer unacknowledged packet
+		add_to_unacked_buf(packet);
 	}
 	if(base == next_seq_num) {
 		stoptimer(0);

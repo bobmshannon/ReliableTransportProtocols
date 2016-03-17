@@ -163,6 +163,8 @@ void send_pkt(int caller, struct pkt packet) {
   // Send packet to receiver
   tolayer3(caller, packet);
   DEBUG("sender: packet sent | seq " << packet.seqnum);
+  // Buffer unacknowledged packet
+  add_to_unacked_buf(packet);
   // Start packet timer
   start_pkt_timer(packet.seqnum);
 }
@@ -175,7 +177,7 @@ void send_pkt(int caller, struct pkt packet) {
 void resend_pkt(int seq_num) {
 	for(std::deque<pkt>::iterator it = unacked_buf.begin(); it != unacked_buf.end(); ) {
 		if((*it).seqnum == seq_num) {
-			DEBUG("sender: re-sending packet due to timeout... | seq " << (*it).seqnum);
+			DEBUG("sender: re-sending unacked packet due to timeout... | seq " << (*it).seqnum);
 			send_pkt(0, (*it));
 		}
 		it++;
@@ -247,14 +249,32 @@ void add_to_unacked_buf(struct pkt packet) {
 	DEBUG("sender: unacked buffer has size " << unacked_buf.size());
 }
 
+void remove_from_unacked_buf(struct pkt packet) {
+	for(std::deque<pkt>::iterator it = unacked_buf.begin(); it != unacked_buf.end(); ) {
+		if((*it).seqnum == packet.seqnum) {
+			unacked_buf.erase(it);
+			break;
+		}
+		it++;
+	}
+}
+
+void remove_from_unsent_buf(struct pkt packet) {
+	for(std::deque<pkt>::iterator it = unsent_buf.begin(); it != unsent_buf.end(); ) {
+		if((*it).seqnum == packet.seqnum) {
+			unsent_buf.erase(it);
+			break;
+		}
+		it++;
+	}
+}
+
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(struct msg message)
 {
 	struct pkt packet = make_pkt(next_seq_num, 0, message);
 	if(next_seq_num < base + window_size) {
 		send_pkt(0, packet);
-		// Buffer unacknowledged packet
-		add_to_unacked_buf(packet);
 	} else {
 		// Buffer unsent packet
 		add_to_unsent_buf(packet);
