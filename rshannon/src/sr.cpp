@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <iterator>
+#include <algorithm>
 
 #define DEBUG_MODE 1 // Whether debugging mode is enabled or disabled
 #define DEBUG(x)                                                               \
@@ -163,8 +164,6 @@ void send_pkt(int caller, struct pkt packet) {
   // Send packet to receiver
   tolayer3(caller, packet);
   DEBUG("sender: packet sent | seq " << packet.seqnum);
-  // Buffer unacknowledged packet
-  add_to_unacked_buf(packet);
   // Start packet timer
   start_pkt_timer(packet.seqnum);
 }
@@ -249,9 +248,10 @@ void add_to_unacked_buf(struct pkt packet) {
 	DEBUG("sender: unacked buffer has size " << unacked_buf.size());
 }
 
-void remove_from_unacked_buf(struct pkt packet) {
+void remove_from_unacked_buf(int seq_num) {
 	for(std::deque<pkt>::iterator it = unacked_buf.begin(); it != unacked_buf.end(); ) {
-		if((*it).seqnum == packet.seqnum) {
+		if((*it).seqnum == seq_num) {
+			DEBUG("sender: removing seq " << seq_num << "from unacked buffer");
 			unacked_buf.erase(it);
 			break;
 		}
@@ -259,9 +259,23 @@ void remove_from_unacked_buf(struct pkt packet) {
 	}
 }
 
-void remove_from_unsent_buf(struct pkt packet) {
+int smallest_unacked_seq() {
+	int min_seq_no, seq_no;
+	min_seq_no = base + window_size + 1;
+	for(std::deque<pkt>::iterator it = unacked_buf.begin(); it != unacked_buf.end(); ) {
+		seq_no = (*it).seqnum;
+		if(seq_no < min_seq_no) {
+			min_seq_no = seq_no;
+		}
+		it++;
+	}
+	return min_seq_no;
+}
+
+void remove_from_unsent_buf(int seq_num) {
 	for(std::deque<pkt>::iterator it = unsent_buf.begin(); it != unsent_buf.end(); ) {
-		if((*it).seqnum == packet.seqnum) {
+		if((*it).seqnum == seq_num) {
+			DEBUG("sender: removing seq " << seq_num << "from unsent buffer");
 			unsent_buf.erase(it);
 			break;
 		}
@@ -275,6 +289,8 @@ void A_output(struct msg message)
 	struct pkt packet = make_pkt(next_seq_num, 0, message);
 	if(next_seq_num < base + window_size) {
 		send_pkt(0, packet);
+	    // Buffer unacknowledged packet
+	    add_to_unacked_buf(packet);
 	} else {
 		// Buffer unsent packet
 		add_to_unsent_buf(packet);
@@ -288,19 +304,33 @@ void A_input(struct pkt packet)
 	if(is_corrupt(packet)) {
 		return;
 	}
+	if(packet.acknum >= base + window_size) {
+		DEBUG("sender: received ACK outside of window");
+		return;
+	}
 	DEBUG("sender: received ack " << packet.acknum);
-	base = packet.acknum + 1;
+
+	// Mark packet as received
 	if(unacked_buf.size() > 0) {
-		unacked_buf.pop_front();
+		remove_from_unacked_buf(packet.acknum);
 		destroy_pkt_timer(packet.acknum);
-	} else if(unsent_buf.size() > 0) {
+	}
+
+	// Update sender base
+	if(packet.acknum == base) {
+		base = smallest_unacked_seq();
+		DEBUG("sender: base updated to " << base);
+	}
+
+	// Send unsent packets
+	if(unacked_buf.size() < window_size) {
 		struct pkt packet = unsent_buf.front();
+		DEBUG("sender: removing seq " << packet.seqnum << "from unacked buffer");
 		unsent_buf.pop_front();
 		send_pkt(0, packet);
+	    // Buffer unacknowledged packet
+	    add_to_unacked_buf(packet);		
 	}
-	/*if(base == next_seq_num) {
-		stoptimer(0);
-	}*/
 }
 
 /* called when A's timer goes off */
@@ -332,6 +362,22 @@ void B_input(struct pkt packet)
 		DEBUG("receiver: packet received but corrupted");
 		return;
 	}
+	// Packet falls within receiver window
+	if(packet.seqnum >= recv_base && packet.seqnum < recv_base+window_size) {
+		// Send selective ACK
+		struct msg ack_data = {};
+		struct pkt ack_pkt = make_pkt(packet.seqnum, packet.seqnum, ack_data);
+		DEBUG("receiver: packet received, sending ack " << expected_seq_num);
+		send_pkt(1, ack_pkt);
+		// Buffer packet if not previously received
+		if(not_received(packet)) {
+			add_to_recv_buf(packet);
+		}
+		if(packet.seqnum == recv_base) {
+			int num_delivered = deliver_chunk(packet.seqnum);
+			recv_base += num_delivered;
+		}
+	}
 	DEBUG("receiver: packet received | seq " << packet.seqnum);
 	/*
 	if(packet.seqnum != expected_seq_num) {
@@ -348,9 +394,52 @@ void B_input(struct pkt packet)
 	expected_seq_num++;*/
 }
 
+int deliver_chunk(int start_seq_no) {
+	std::sort(recv_buf.begin(), recv_buf.end(), compare_by_seq_no);
+	int begin, end;
+	int prev_seq_no = start_seq_no;
+	for(int i = 0; i < recv_buf.size(); i++) {
+		if(recv_buf[i].seqnum == start_seq_no) {
+			begin = i;
+			break;
+		}
+	}
+	for(int i = begin+1; i < recv_buf.size(); i++) {
+		if(recv_buf[i].seqnum == prev_seq_no + 1) {
+			end = i;
+			prev_seq_no++;
+		} else {
+			break;
+		}
+	}
+	for(int i = begin; i < end; i++) {
+		tolayer5(1, recv_buf[i].payload);
+	}
+	//recv_buf.erase(recv_buf.begin()+begin, recv_buf.begin()+end+1);
+	return end - begin + 1;
+}
+
+bool not_received(struct pkt packet) {
+	for(int i = 0; i < recv_buf.size(); i++) {
+		if(recv_buf[i].seqnum == packet.seqnum) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void add_to_recv_buf(struct pkt packet) {
+	recv_buf.push_back(packet);
+}
+
+bool compare_by_seq_no(const pkt &a, const pkt &b) {
+    return a.seqnum < b.seqnum;
+}
+
 /* the following rouytine will be called once (only) before any other */
 /* entity B routines are called. You can use it to do any initialization */
 void B_init()
 {
+	recv_base = 1;
 	expected_seq_num = 1;
 }
