@@ -127,6 +127,7 @@ void pkt_timer_interrupt_handler(int seq_num) {
  * @param seq_num The sequence number of the packet to resend
  */
 void resend_pkt(int seq_num) {
+	DEBUG("sender: unacked buf size " << unacked_buf.size());
 	for(std::deque<pkt>::iterator it = unacked_buf.begin(); it != unacked_buf.end(); ) {
 		if((*it).seqnum == seq_num) {
 			DEBUG("sender: re-sending packet due to timeout... | seq " << (*it).seqnum);
@@ -166,6 +167,15 @@ pkt make_pkt(int seqnum, int acknum, struct msg message) {
   strncpy(packet.payload, message.data, MSG_LEN);
   packet.checksum = checksum(packet);
   new_pkt_timer(seqnum);	// Create packet timer
+  return packet;
+}
+
+pkt make_ack_pkt(int seqnum, int acknum, struct msg message) {
+  struct pkt packet = {}; // Initialize packet and zero fill members
+  packet.seqnum = seqnum;
+  packet.acknum = acknum;
+  strncpy(packet.payload, message.data, MSG_LEN);
+  packet.checksum = checksum(packet);
   return packet;
 }
 
@@ -274,12 +284,14 @@ void A_input(struct pkt packet)
 
 	// Mark packet as received
 	int i;
+	bool pkt_already_received = true;
 	for(i = 0; i < unacked_buf.size(); i++) {
 		if(unacked_buf[i].seqnum == packet.acknum) {
+			pkt_already_received = false;
 			break;
 		}
 	}
-	unacked_buf.erase(unacked_buf.begin()+i);
+	if(!pkt_already_received) { unacked_buf.erase(unacked_buf.begin()+i); }
 
 	// Update window base
 	if(packet.acknum == send_base) {
@@ -339,7 +351,7 @@ void B_input(struct pkt packet)
 	if(packet.seqnum >= recv_base && packet.seqnum < recv_base + window_size) {
 		// Send acknowledgement
 		struct msg ack_data = {};
-		struct pkt ack_pkt = make_pkt(packet.seqnum, packet.seqnum, ack_data);
+		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum, ack_data);
 		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
 		send_pkt(1, ack_pkt);
 
@@ -364,7 +376,7 @@ void B_input(struct pkt packet)
 			}
 			// clear recv buf
 			if(recv_buf.size() > 0) { recv_buf.erase(recv_buf.begin(), recv_buf.begin()+last+1); }
-			
+
 		} else {
 			// buffer out of order packet
 			recv_buf.push_back(packet);
@@ -372,7 +384,7 @@ void B_input(struct pkt packet)
 	} else if(packet.seqnum >= recv_base - window_size && packet.seqnum < recv_base) {
 		// Send acknowledgement
 		struct msg ack_data = {};
-		struct pkt ack_pkt = make_pkt(packet.seqnum, packet.seqnum, ack_data);
+		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum, ack_data);
 		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
 		send_pkt(1, ack_pkt);
 	}
