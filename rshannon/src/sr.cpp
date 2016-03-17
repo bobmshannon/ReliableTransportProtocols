@@ -359,10 +359,10 @@ void B_input(struct pkt packet)
 		if(packet.seqnum == recv_base) {
 			// deliver in order packets starting from recv_base
 			int last = 0;
-			std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
-			for(int i = 0; i < unacked_buf.size(); i++) {
+			std::sort(recv_buf.begin(), recv_buf.end(), sort_by_seq);
+			for(int i = 0; i < recv_buf.size(); i++) {
 				if(i == 0) { continue; }
-				if(unacked_buf[i-1].seqnum+1 != unacked_buf[i].seqnum) {
+				if(recv_buf[i-1].seqnum+1 != recv_buf[i].seqnum) {
 					break;
 				} else {
 					last = i-1;
@@ -370,12 +370,15 @@ void B_input(struct pkt packet)
 			}
 			for(int i = 0; i <= last; i++) {
 				// deliver packet
-				tolayer5(1, unacked_buf[i].payload);
+				tolayer5(1, recv_buf[i].payload);
 				// advance recv_base by number of packets delivered
 				recv_base++;
 			}
 			// clear recv buf
-			if(recv_buf.size() > 0) { recv_buf.erase(recv_buf.begin(), recv_buf.begin()+last+1); }
+			if(recv_buf.size() > 0) {
+				if(last == 0) { recv_buf.erase(recv_buf.begin()); }
+				else { recv_buf.erase(recv_buf.begin(), recv_buf.begin()+last+1); }
+			}
 
 		} else {
 			// buffer out of order packet
