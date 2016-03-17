@@ -170,11 +170,12 @@ pkt make_pkt(int seqnum, int acknum, struct msg message) {
   return packet;
 }
 
-pkt make_ack_pkt(int seqnum, int acknum, struct msg message) {
+pkt make_ack_pkt(int seqnum, int acknum) {
   struct pkt packet = {}; // Initialize packet and zero fill members
+  struct msg ack_msg = {};
   packet.seqnum = seqnum;
   packet.acknum = acknum;
-  strncpy(packet.payload, message.data, MSG_LEN);
+  strncpy(packet.payload, ack_msg.data, MSG_LEN);
   packet.checksum = checksum(packet);
   return packet;
 }
@@ -350,8 +351,7 @@ void B_input(struct pkt packet)
 
 	if(packet.seqnum >= recv_base && packet.seqnum < recv_base + window_size) {
 		// Send acknowledgement
-		struct msg ack_data = {};
-		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum, ack_data);
+		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
 		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
 		send_pkt(1, ack_pkt);
 
@@ -383,8 +383,7 @@ void B_input(struct pkt packet)
 		}
 	} else if(packet.seqnum >= recv_base - window_size && packet.seqnum < recv_base) {
 		// Send acknowledgement
-		struct msg ack_data = {};
-		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum, ack_data);
+		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
 		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
 		send_pkt(1, ack_pkt);
 	}
