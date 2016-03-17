@@ -17,25 +17,23 @@
  * Create a new packet timer.
  * 
  * @param seq_num  The sequence number of the corresponding packet
- * @param interval Fire timer every X time units
  */
-void new_timer(int seq_num, float interval) {
+void new_pkt_timer(int seq_num) {
 	if(pkt_timers.size() > MAX_NO_TIMERS) {
 		// Too many active timers.
 		DEBUG("packet timer: could not create a new timer for seq " << seq_num << " bececause there are too many timers currently running");
 		return;
 	}
-	if(timer_exists(seq_num)) {
+	if(pkt_timer_exists(seq_num)) {
 		DEBUG("packet timer: could not create new timer for seq " << seq_num << " because one already exists.");
 		return;		
 	}
 	// Construct packet timer.
 	struct pkt_timer timer;
 	timer.seq_num = seq_num;
-	timer.interval = interval;
-	timer.next_fire = get_sim_time() + interval;
-	timer.active = true;
-	// Activate packet timer.
+	timer.next_fire = get_sim_time() + PKT_TIMEOUT;
+	timer.active = false;
+	// Add packet timer to collection
 	pkt_timers.push_back(timer);
 }
 
@@ -44,12 +42,12 @@ void new_timer(int seq_num, float interval) {
  * 
  * @param seq_num  The sequence number of the corresponding packet
  */
-void start_timer(int seq_num) {
+void start_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
-			DEBUG("packet timer: starting timer for seq " << seq_num);
+			DEBUG("packet timer: starting timer for seq " << seq_num << " | next fire at " << get_sim_time() + PKT_TIMEOUT);
 			pkt_timers[i].active = true;
-			pkt_timers[i].next_fire = get_sim_time() + pkt_timers[i].interval;
+			pkt_timers[i].next_fire = get_sim_time() + PKT_TIMEOUT;
 			break;
 		}
 	}	
@@ -60,7 +58,7 @@ void start_timer(int seq_num) {
  * 
  * @param seq_num  The sequence number of the corresponding packet
  */
-void stop_timer(int seq_num) {
+void stop_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
 			DEBUG("packet timer: stopping timer for seq " << seq_num);
@@ -75,7 +73,7 @@ void stop_timer(int seq_num) {
  * 
  * @param seq_num The sequence number of the corresponding packet
  */
-void destroy_timer(int seq_num) {
+void destroy_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
 			DEBUG("packet timer: destroyed timer for seq " << seq_num);
@@ -90,12 +88,12 @@ void destroy_timer(int seq_num) {
  *
  * @param seq_num The sequence number of the corresponding packet
  */
-void fire_timer(int seq_num) {
+void fire_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
-			DEBUG("packet timer: timer for seq " << seq_num << " fired");
+			DEBUG("packet timer: timer for seq " << seq_num << " fired" << " because next_fire_time was " << pkt_timers[i].next_fire);
 			pkt_timers[i].active = false;
-			timer_interrupt_handler(seq_num);
+			pkt_timer_interrupt_handler(seq_num);
 		}
 	}
 }
@@ -103,10 +101,10 @@ void fire_timer(int seq_num) {
 /**
  * Fire all expired packet timers.
  */
-void fire_expired_timers() {
+void fire_expired_pkt_timers() {
 	for(int i = 0; i < pkt_timers.size(); i++) {
-		if(pkt_timers[i].next_fire <= get_sim_time()) {
-			fire_timer(pkt_timers[i].seq_num);
+		if(get_sim_time() >= pkt_timers[i].next_fire && pkt_timers[i].active) {
+			fire_pkt_timer(pkt_timers[i].seq_num);
 		}
 	}
 }
@@ -116,7 +114,7 @@ void fire_expired_timers() {
  * 
  * @param seq_num The sequence number of the corresponding packet
  */
-void timer_interrupt_handler(int seq_num) {
+void pkt_timer_interrupt_handler(int seq_num) {
 	// In the case of the selective repeat (SR) protocol,
 	// when a packet times out, it should be resent.
 	resend_pkt(seq_num);
@@ -128,7 +126,7 @@ void timer_interrupt_handler(int seq_num) {
  * @param seq_num The sequence number of the corresponding packet
  * @return        true or false
  */
-bool timer_exists(int seq_num) {
+bool pkt_timer_exists(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
 			return true;
@@ -151,6 +149,7 @@ pkt make_pkt(int seqnum, int acknum, struct msg message) {
   packet.acknum = acknum;
   strncpy(packet.payload, message.data, MSG_LEN);
   packet.checksum = checksum(packet);
+  new_pkt_timer(seqnum);	// Create packet timer
   return packet;
 }
 
@@ -164,12 +163,8 @@ void send_pkt(int caller, struct pkt packet) {
   // Send packet to receiver
   tolayer3(caller, packet);
   DEBUG("sender: packet sent | seq " << packet.seqnum);
-  if(base == next_seq_num) {
-  	// Start hardware timer
-  	starttimer(caller, timer_interval);
-  	// Start packet timer
-  	start_timer(packet.seqnum);
-  }
+  // Start packet timer
+  start_pkt_timer(packet.seqnum);
 }
 
 /**
@@ -178,10 +173,10 @@ void send_pkt(int caller, struct pkt packet) {
  * @param seq_num The sequence number of the packet to resend
  */
 void resend_pkt(int seq_num) {
-	for(std::deque<pkt>::iterator it = unsent_buf.begin(); it != unsent_buf.end(); ) {
-		struct pkt packet = *it;
-		if(packet.seqnum == seq_num) {
-			send_pkt(0, packet);
+	for(std::deque<pkt>::iterator it = unacked_buf.begin(); it != unacked_buf.end(); ) {
+		if((*it).seqnum == seq_num) {
+			DEBUG("sender: re-sending packet due to timeout... | seq " << (*it).seqnum);
+			send_pkt(0, (*it));
 		}
 		it++;
 	}
@@ -277,7 +272,7 @@ void A_input(struct pkt packet)
 	base = packet.acknum + 1;
 	if(unacked_buf.size() > 0) {
 		unacked_buf.pop_front();
-		destroy_timer(packet.acknum);
+		destroy_pkt_timer(packet.acknum);
 	} else if(unsent_buf.size() > 0) {
 		struct pkt packet = unsent_buf.front();
 		unsent_buf.pop_front();
@@ -291,7 +286,7 @@ void A_input(struct pkt packet)
 /* called when A's timer goes off */
 void A_timerinterrupt() {
 	// Fire all expired packet timers
-	fire_expired_timers();
+	fire_expired_pkt_timers();
 
   	// Restart hardware timer
   	starttimer(0, 1.0);
@@ -304,7 +299,8 @@ void A_init()
 	base = 1;
 	next_seq_num = 1;
 	window_size = getwinsize();
-	timer_interval = 1.0;
+  	// Start hardware timer
+  	starttimer(0, 1.0);
 }
 
 /* Note that with simplex transfer from a-to-B, there is no B_output() */
