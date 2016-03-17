@@ -4,7 +4,7 @@
 #include <cstring>
 #include <iostream>
 
-#define DEBUG_MODE 0 // Whether debugging mode is enabled or disabled
+#define DEBUG_MODE 1 // Whether debugging mode is enabled or disabled
 #define DEBUG(x)                                                               \
   do {                                                                         \
     if (DEBUG_MODE) {                                                          \
@@ -131,6 +131,7 @@ void A_input(struct pkt packet)
 	if(is_corrupt(packet)) {
 		return;
 	}
+	DEBUG("sender: received ack " << packet.acknum);
 	base = packet.acknum + 1;
 	if(unacked_buf.size() > 0) {
 		unacked_buf.pop_front();
@@ -175,7 +176,8 @@ void A_init()
 	base = 1;
 	next_seq_num = 1;
 	window_size = getwinsize();
-	timer_interval = window_size * 5.0;
+	//timer_interval = window_size * 5.0;
+	timer_interval = 15.0;
 }
 
 /* Note that with simplex transfer from a-to-B, there is no B_output() */
