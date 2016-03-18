@@ -301,11 +301,16 @@ void A_input(struct pkt packet)
 	if(packet.acknum == send_base) {
 		std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
 		//send_base = unacked_buf[0].seqnum;
+		
+		// If smallest unACKed packet
+		if(unacked_buf[0].seqnum == packet.acknum) {
+			send_base = unacked_buf[0].seqnum + 1;
+		}
 
-		// Send a queued packet if there is space available in the window
+		// Send queued packets if there is space available in the window
 		int free_to_send = window_size - unacked_buf.size();	// The number of new packets that can be sent
 		int avail_to_send = unsent_buf.size();					// The number of queued packet available to be sent
-
+		if(free_to_send > avail_to_send) { free_to_send = avail_to_send; }
 		for(int i = 0; i < free_to_send; i++) {
 			if(unsent_buf.size() == 0) { break; }
 			struct pkt packet = unsent_buf.front();
