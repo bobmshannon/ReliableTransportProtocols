@@ -135,7 +135,9 @@ void cumulative_ack(int seq_num) {
 
 void fill_sender_window() {
 	int num_to_send = window_size - unacked_buf.size();
+	int num_unsent = unsent_buf.size();
 	if(num_to_send == 0 || unsent_buf.size() == 0) { return; }
+	if(num_to_send > num_unsent) { num_to_send = num_unsent; }
 	for(int i = 0; i < num_to_send; i++) {
 		tolayer3(0, unsent_buf[i]);
 		unacked(unsent_buf[i]);
