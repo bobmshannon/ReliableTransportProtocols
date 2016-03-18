@@ -168,7 +168,7 @@ void A_timerinterrupt() {
 		DEBUG("sender: re-sending packet " << unacked_buf[i].seqnum << " due to timeout");
 		tolayer3(0, unacked_buf[i]);
 	}
-	starttimer(0, 11.0);
+	starttimer(0, timer_interval);
 }  
 
 void A_init()
@@ -178,7 +178,7 @@ void A_init()
 	window_size = getwinsize();
 	timer_interval = 11.0;
   	// Start hardware timer
-  	starttimer(0, 11.0);
+  	starttimer(0, timer_interval);
 }
 
 void ack(int seq_num) {
