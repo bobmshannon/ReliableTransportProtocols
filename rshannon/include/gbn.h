@@ -13,13 +13,13 @@
  /**
   * Buffer containing all unacknowledged packets.
   */
- std::deque<struct pkt> unacked_buf;
+ std::vector<struct pkt> unacked_buf;
 
  /**
   * Buffer containing all packets ready to be sent out
   * as soon as they are within the send window.
   */
- std::deque<struct pkt> unsent_buf;
+ std::vector<struct pkt> unsent_buf;
 
  /**
   * Fire timer every X time units. This is a function
@@ -31,8 +31,7 @@
  * Helper methods to add a packet to a buffer.
  * Necessary in order to enforce a maximum queue size.
  */
- void add_to_unsent_buf(struct pkt packet);
- void add_to_unacked_buf(struct pkt packet);
+bool sort_by_seq(const pkt& a, const pkt& b);
 
 /**
  * Go-Back-N (GBN) Sender (Computer Networking: A Top Down Approach, Kurose & Ross, pg 218)
