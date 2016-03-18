@@ -4,7 +4,7 @@
 #include <cstring>
 #include <iostream>
 
-#define DEBUG_MODE 0 // Whether debugging mode is enabled or disabled
+#define DEBUG_MODE 1 // Whether debugging mode is enabled or disabled
 #define DEBUG(x)                                                               \
   do {                                                                         \
     if (DEBUG_MODE) {                                                          \
@@ -132,20 +132,43 @@ void A_input(struct pkt packet)
 		return;
 	}
 	DEBUG("sender: received ack " << packet.acknum);
-	base = packet.acknum + 1;
+	if(packet.acknum > base) {
+		base = packet.acknum + 1;
+		stoptimer(0);
+		starttimer(0, timer_interval);
+		for(int i = 0; i < packet.acknum - base; i++) {
+			unacked_buf.pop_front();
+		}
+	}
 	if(unacked_buf.size() > 0) {
 		unacked_buf.pop_front();
-	} else if(unsent_buf.size() > 0) {
+	}
+
+	fill_sender_window();
+	/*
+	else if(unsent_buf.size() > 0) {
+		struct pkt packet = unsent_buf.front();
+		unsent_buf.pop_front();
+		send_pkt(0, packet);
+		// Buffer unacknowledged packet
+		add_to_unacked_buf(packet);
+	}*/
+
+	if(base == next_seq_num) {
+		stoptimer(0);
+	}
+}
+
+void fill_sender_window() {
+	while(unacked_buf.size() < window_size && unsent_buf.size() > 0) {
 		struct pkt packet = unsent_buf.front();
 		unsent_buf.pop_front();
 		send_pkt(0, packet);
 		// Buffer unacknowledged packet
 		add_to_unacked_buf(packet);
 	}
-	if(base == next_seq_num) {
-		stoptimer(0);
-	}
 }
+
 
 /* called when A's timer goes off */
 void A_timerinterrupt() {
@@ -179,7 +202,7 @@ void A_init()
 	next_seq_num = 1;
 	window_size = getwinsize();
 	//timer_interval = window_size * 5.0;
-	timer_interval = 15.0;
+	timer_interval = 11.0;
 }
 
 /* Note that with simplex transfer from a-to-B, there is no B_output() */
@@ -193,6 +216,10 @@ void B_input(struct pkt packet)
 	}
 	if(packet.seqnum != expected_seq_num) {
 		DEBUG("receiver: unexpected sequence number | expected " << expected_seq_num << " but got " << packet.seqnum);
+		// Send acknowledgement of last received packet
+		struct msg ack_data = {};
+		struct pkt ack_pkt = make_pkt(expected_seq_num-1, expected_seq_num-1, ack_data);
+		send_pkt(1, ack_pkt);
 		return;
 	}
 	// Deliver message to application

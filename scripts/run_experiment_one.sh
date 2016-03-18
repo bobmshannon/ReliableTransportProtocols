@@ -20,60 +20,60 @@
 # Alternating Bit Protocol (ABT)
 #################################################
 # Experiment 1, l=0.1
-./run_experiments -o "Exp1-ABT-loss-0.1" -m 1000 -l 0.1 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
+./run_experiments -o "Exp1-ABT-loss-0.1.csv" -m 1000 -l 0.1 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
 # Experiment 1, l=0.2
-./run_experiments -o "Exp1-ABT-loss-0.2" -m 1000 -l 0.2 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
+./run_experiments -o "Exp1-ABT-loss-0.2.csv" -m 1000 -l 0.2 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
 # Experiment 1, l=0.4
-./run_experiments -o "Exp1-ABT-loss-0.4" -m 1000 -l 0.4 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
+./run_experiments -o "Exp1-ABT-loss-0.4.csv" -m 1000 -l 0.4 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
 # Experiment 1, l=0.6
-./run_experiments -o "Exp1-ABT-loss-0.6" -m 1000 -l 0.6 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
+./run_experiments -o "Exp1-ABT-loss-0.6.csv" -m 1000 -l 0.6 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
 # Experiment 1, l=0.8
-./run_experiments -o "Exp1-ABT-loss-0.8" -m 1000 -l 0.8 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
+./run_experiments -o "Exp1-ABT-loss-0.8.csv" -m 1000 -l 0.8 -c 0.2 -t 50 -w 10 -p ../rshannon/abt
 #################################################
 # Go-Back-N (GBN)
 #################################################
 # Experiment 1, l=0.1, w=10
 ./run_experiments -o "Exp1-GBN-loss-0.1-window-10" -m 1000 -l 0.1 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
 # Experiment 1, l=0.2, w=10
-./run_experiments -o "Exp1-GBN-loss-0.2-window-10" -m 1000 -l 0.2 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.2-window-10.csv" -m 1000 -l 0.2 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
 # Experiment 1, l=0.4, w=10
-./run_experiments -o "Exp1-GBN-loss-0.4-window-10" -m 1000 -l 0.4 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.4-window-10.csv" -m 1000 -l 0.4 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
 # Experiment 1, l=0.6, w=10
-./run_experiments -o "Exp1-GBN-loss-0.6-window-10" -m 1000 -l 0.6 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.6-window-10.csv" -m 1000 -l 0.6 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
 # Experiment 1, l=0.8, w=10
-./run_experiments -o "Exp1-GBN-loss-0.8-window-10" -m 1000 -l 0.8 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.8-window-10.csv" -m 1000 -l 0.8 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
 # Experiment 1, l=0.1, w=50
-./run_experiments -o "Exp1-GBN-loss-0.1-window-50" -m 1000 -l 0.1 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.1-window-50.csv" -m 1000 -l 0.1 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
 # Experiment 1, l=0.2, w=50
-./run_experiments -o "Exp1-GBN-loss-0.2-window-50" -m 1000 -l 0.2 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.2-window-50.csv" -m 1000 -l 0.2 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
 # Experiment 1, l=0.4, w=50
-./run_experiments -o "Exp1-GBN-loss-0.4-window-50" -m 1000 -l 0.4 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.4-window-50.csv" -m 1000 -l 0.4 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
 # Experiment 1, l=0.6, w=50
-./run_experiments -o "Exp1-GBN-loss-0.6-window-50" -m 1000 -l 0.6 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.6-window-50.csv" -m 1000 -l 0.6 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
 # Experiment 1, l=0.8, w=50
-./run_experiments -o "Exp1-GBN-loss-0.8-window-50" -m 1000 -l 0.8 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.8-window-50.csv" -m 1000 -l 0.8 -c 0.2 -t 50 -w 50 -p ../rshannon/gbn
 #################################################
 # Selective Repeat (SR)
 #################################################
 # Experiment 1, l=0.1, w=10
-./run_experiments -o "Exp1-SR-loss-0.1-window-10" -m 1000 -l 0.1 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.1-window-10.csv" -m 1000 -l 0.1 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
 # Experiment 1, l=0.2, w=10
-./run_experiments -o "Exp1-SR-loss-0.2-window-10" -m 1000 -l 0.2 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.2-window-10.csv" -m 1000 -l 0.2 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
 # Experiment 1, l=0.4, w=10
-./run_experiments -o "Exp1-SR-loss-0.4-window-10" -m 1000 -l 0.4 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.4-window-10.csv" -m 1000 -l 0.4 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
 # Experiment 1, l=0.6, w=10
-./run_experiments -o "Exp1-SR-loss-0.6-window-10" -m 1000 -l 0.6 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.6-window-10.csv" -m 1000 -l 0.6 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
 # Experiment 1, l=0.8, w=10
-./run_experiments -o "Exp1-SR-loss-0.8-window-10" -m 1000 -l 0.8 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.8-window-10.csv" -m 1000 -l 0.8 -c 0.2 -t 50 -w 10 -p ../rshannon/sr
 # Experiment 1, l=0.1, w=50
-./run_experiments -o "Exp1-SR-loss-0.1-window-50" -m 1000 -l 0.1 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.1-window-50.csv" -m 1000 -l 0.1 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
 # Experiment 1, l=0.2, w=50
-./run_experiments -o "Exp1-SR-loss-0.2-window-50" -m 1000 -l 0.2 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.2-window-50.csv" -m 1000 -l 0.2 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
 # Experiment 1, l=0.4, w=50
-./run_experiments -o "Exp1-SR-loss-0.4-window-50" -m 1000 -l 0.4 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.4-window-50.csv" -m 1000 -l 0.4 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
 # Experiment 1, l=0.6, w=50
-./run_experiments -o "Exp1-SR-loss-0.6-window-50" -m 1000 -l 0.6 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.6-window-50.csv" -m 1000 -l 0.6 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
 # Experiment 1, l=0.8, w=50
-./run_experiments -o "Exp1-SR-loss-0.8-window-50" -m 1000 -l 0.8 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
+./run_experiments -o "Exp1-SR-loss-0.8-window-50.csv" -m 1000 -l 0.8 -c 0.2 -t 50 -w 50 -p ../rshannon/sr
 
 echo "Experiment script completed running" | dd of=status.txt

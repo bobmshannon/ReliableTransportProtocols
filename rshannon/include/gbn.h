@@ -69,4 +69,6 @@ int expected_seq_num;
 
 void send_pkt(int caller, struct pkt packet);
 
+void fill_sender_window();
+
 #endif
