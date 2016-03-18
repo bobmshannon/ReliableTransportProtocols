@@ -5,7 +5,7 @@
 #include <iostream>
 #include <algorithm>
 
-#define DEBUG_MODE 0 // Whether debugging mode is enabled or disabled
+#define DEBUG_MODE 1 // Whether debugging mode is enabled or disabled
 #define DEBUG(x)                                                               \
   do {                                                                         \
     if (DEBUG_MODE) {                                                          \
@@ -155,12 +155,15 @@ void A_input(struct pkt packet)
 	base = packet.acknum + 1;
 	cumulative_ack(packet.acknum);
 	fill_sender_window();
-	if(base == next_seq_num) {
-		stoptimer(0);
-	} else {
-		stoptimer(0);
-		starttimer(0, timer_interval);
-	}
+	stoptimer(0);
+	starttimer(0, timer_interval);
+	//if(base == next_seq_num) {
+	//	stoptimer(0);
+	//	starttimer(0, timer_interval);
+	//} //else {
+	  //	stoptimer(0);
+	  //	starttimer(0, timer_interval);
+	  // }
 }
 
 void A_timerinterrupt() {
@@ -168,6 +171,7 @@ void A_timerinterrupt() {
 		DEBUG("sender: re-sending packet " << unacked_buf[i].seqnum << " due to timeout");
 		tolayer3(0, unacked_buf[i]);
 	}
+	timer_interval += .1;
 	starttimer(0, timer_interval);
 }  
 

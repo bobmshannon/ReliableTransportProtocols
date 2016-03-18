@@ -33,7 +33,7 @@
 # Go-Back-N (GBN)
 #################################################
 # Experiment 1, l=0.1, w=10
-./run_experiments -o "Exp1-GBN-loss-0.1-window-10" -m 1000 -l 0.1 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
+./run_experiments -o "Exp1-GBN-loss-0.1-window-10.csv" -m 1000 -l 0.1 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
 # Experiment 1, l=0.2, w=10
 ./run_experiments -o "Exp1-GBN-loss-0.2-window-10.csv" -m 1000 -l 0.2 -c 0.2 -t 50 -w 10 -p ../rshannon/gbn
 # Experiment 1, l=0.4, w=10
