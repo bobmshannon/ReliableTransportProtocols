@@ -6,7 +6,7 @@
 #include <iterator>
 #include <algorithm>
 
-#define DEBUG_MODE 0 // Whether debugging mode is enabled or disabled
+#define DEBUG_MODE 1 // Whether debugging mode is enabled or disabled
 #define DEBUG(x)                                                               \
   do {                                                                         \
     if (DEBUG_MODE) {                                                          \
@@ -292,12 +292,15 @@ void A_input(struct pkt packet)
 			break;
 		}
 	}
-	if(!pkt_already_received) { unacked_buf.erase(unacked_buf.begin()+i); }
+	if(!pkt_already_received) { 
+		destroy_pkt_timer(packet.acknum);
+		unacked_buf.erase(unacked_buf.begin()+i);
+	}
 
 	// Update window base
 	if(packet.acknum == send_base) {
 		std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
-		send_base = unacked_buf[0].seqnum;
+		//send_base = unacked_buf[0].seqnum;
 
 		// Send a queued packet if there is space available in the window
 		int free_to_send = window_size - unacked_buf.size();	// The number of new packets that can be sent
@@ -313,6 +316,7 @@ void A_input(struct pkt packet)
 		}
 	}
 	
+	send_base++;
 }
 
 bool sort_by_seq(const pkt& a, const pkt& b) {
@@ -353,10 +357,12 @@ void B_input(struct pkt packet)
 		// Send acknowledgement
 		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
 		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
-		send_pkt(1, ack_pkt);
+		tolayer3(1, ack_pkt);
 
 		// packet is within receiver window
 		if(packet.seqnum == recv_base) {
+			// buffer received packet
+			recv_buf.push_back(packet);
 			// deliver in order packets starting from recv_base
 			int last = 0;
 			std::sort(recv_buf.begin(), recv_buf.end(), sort_by_seq);
@@ -369,6 +375,7 @@ void B_input(struct pkt packet)
 				}
 			}
 			for(int i = 0; i <= last; i++) {
+				DEBUG("receiver: delivering packet " << recv_buf[i].seqnum);
 				// deliver packet
 				tolayer5(1, recv_buf[i].payload);
 				// advance recv_base by number of packets delivered

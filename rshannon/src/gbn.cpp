@@ -171,7 +171,7 @@ void A_timerinterrupt() {
 		DEBUG("sender: re-sending packet " << unacked_buf[i].seqnum << " due to timeout");
 		tolayer3(0, unacked_buf[i]);
 	}
-	timer_interval += .1;
+	//timer_interval += .1;
 	starttimer(0, timer_interval);
 }  
 
