@@ -66,8 +66,53 @@ int next_seq_num;
 int window_size;
 int expected_seq_num;
 
+/**
+ * Send a packet.
+ * 
+ * @param caller the sender, 0 for A, 1 for B
+ * @param packet the packet to send
+ */
 void send_pkt(int caller, struct pkt packet);
 
+/**
+ * Fill the sender window with the maximum amount of unsent packets
+ * allowable by the window size.
+ */
 void fill_sender_window();
+
+/**
+ * Acknowledge a received packet. Constructs and
+ * sends an ACK packet to the sender.
+ *
+ * @param seq_num the sequence number of the packet to acknowledge
+ */
+void ack(int seq_num);
+
+/**
+ * Acknowledge a packet and all the ones sent before it.
+ *
+ * @param seq_num the sequence number of the packet to cumulative ACK
+ */
+void cumulative_ack(int seq_num);
+
+/**
+ * Mark a packet as unsent.
+ *
+ * @param packet the unsent packet
+ */
+void unsent(struct pkt packet);
+
+/**
+ * Mark a packet as unacknowledged.
+ *
+ * @param packet the unacknowledged packet
+ */
+void unacked(struct pkt packet);
+
+/**
+ * Custom comparator. Sorts packets by sequence number,
+ * from smallest to highest. Used with std::sort.
+ */
+bool sort_by_seq(const pkt &a, const pkt &b);
 
 #endif
