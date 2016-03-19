@@ -118,6 +118,7 @@ void A_output(struct msg message)
 		struct pkt packet = make_pkt(next_seq_num, 0, message);
 		unsent(packet);
 	}
+	DEBUG("num unacked: " << unacked_buf.size());
 }
 
 void cumulative_ack(int seq_num) {

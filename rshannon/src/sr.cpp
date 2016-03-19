@@ -283,6 +283,18 @@ void A_input(struct pkt packet)
 	}
 	//DEBUG("sender: received ack " << packet.acknum);
 
+	// Update send_base
+	std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
+	if(unacked_buf[0].seqnum == packet.acknum) {
+		if(unacked_buf.size() > 1) {
+			send_base = unacked_buf[1].seqnum;
+		} else {
+			send_base++;
+		}
+	}
+	//send_base = unacked_buf[0].seqnum;	
+	DEBUG("BASE updated to " << send_base);	
+
 	// Mark packet as received
 	int i;
 	bool pkt_already_received = true;
@@ -297,26 +309,28 @@ void A_input(struct pkt packet)
 		unacked_buf.erase(unacked_buf.begin()+i);
 	}
 
+	// Send queued packets if there is space available in the window
+	int free_to_send = window_size - unacked_buf.size();	// The number of new packets that can be sent
+	int avail_to_send = unsent_buf.size();					// The number of queued packet available to be sent
+	if(free_to_send > avail_to_send) { free_to_send = avail_to_send; }
+	for(int i = 0; i < free_to_send; i++) {
+		if(unsent_buf.size() == 0) { break; }
+		struct pkt packet = unsent_buf.front();
+		unsent_buf.pop_front();
+		send_pkt(0, packet);
+		// Buffer unacknowledged packet
+		add_to_unacked_buf(packet);
+	}
+
 	// Update window base
 	if(packet.acknum == send_base) {
-		std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
-		send_base = unacked_buf[0].seqnum;
+		//std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
+		//send_base = unacked_buf[0].seqnum;	
+		//DEBUG("BASE updated to " << send_base);	
 
-		// Send queued packets if there is space available in the window
-		int free_to_send = window_size - unacked_buf.size();	// The number of new packets that can be sent
-		int avail_to_send = unsent_buf.size();					// The number of queued packet available to be sent
-		if(free_to_send > avail_to_send) { free_to_send = avail_to_send; }
-		for(int i = 0; i < free_to_send; i++) {
-			if(unsent_buf.size() == 0) { break; }
-			struct pkt packet = unsent_buf.front();
-			unsent_buf.pop_front();
-			send_pkt(0, packet);
-			// Buffer unacknowledged packet
-			add_to_unacked_buf(packet);
-		}
+
 	}
-	
-	send_base++;
+	//send_base++;
 }
 
 bool sort_by_seq(const pkt& a, const pkt& b) {
@@ -431,12 +445,12 @@ void B_input(struct pkt packet)
 			DEBUG("receiver: buffering out of order packet " << packet.seqnum);
 			recv_buf.push_back(packet);
 		}
-	} else if (packet.seqnum >= recv_base-window_size && packet.seqnum < recv_base) {
+	} //else if (packet.seqnum >= recv_base-window_size && packet.seqnum < recv_base) {
 		// Send acknowledgement
 		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
 		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
 		send_pkt(1, ack_pkt);
-	}
+	//}
 }
 
 /* the following rouytine will be called once (only) before any other */

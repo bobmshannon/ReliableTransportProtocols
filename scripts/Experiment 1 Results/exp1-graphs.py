@@ -45,7 +45,7 @@ def graph_two():
 	gbn_throughput = [0.0200937, 0.0200554, 0.0201345, 0.0156285, 0.0029316]
 	plt.plot(loss, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
-	sr_throughput = [0.020088, 0.0199358, 0.0199874, 0.0190498, 0.0025836]
+	sr_throughput = [0.020088, 0.0199358, 0.0199874, 0.0190498, 0.0040894]
 	plt.plot(loss, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Loss Probability (%)')
