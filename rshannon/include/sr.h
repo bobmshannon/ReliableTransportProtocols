@@ -18,10 +18,10 @@
  * A packet timer.
  */
 struct pkt_timer {
-  int seq_num; // The corresponding sequence number of the packet associated with
-              // this timer
+  int seq_num;     // The corresponding sequence number of the packet associated
+                   // with this timer
   float next_fire; // Next scheduled timer interrupt
-  bool active;	// Whether this timer is active or not
+  bool active;     // Whether this timer is active or not
 };
 
 /**
@@ -69,7 +69,7 @@ float timer_interval;
  */
 void add_to_unsent_buf(struct pkt packet);
 void add_to_unacked_buf(struct pkt packet);
-bool sort_by_seq(const pkt& a, const pkt& b);
+bool sort_by_seq(const pkt &a, const pkt &b);
 
 /**
  * Buffer which stores out of order packets on receiver side.
@@ -86,7 +86,7 @@ int recv_base;
 
 /**
  * Send a packet through the network.
- * 
+ *
  * @param caller 0 for A, 1 for B
  * @param packet the packet to send
  */
@@ -94,7 +94,7 @@ void send_pkt(int caller, struct pkt packet);
 
 /**
  * Re-send an unacknowledged packet.
- * 
+ *
  * @param seq_num the sequence number of the unacknowledged packet to re-send
  */
 void resend_pkt(int seq_num);
