@@ -70,7 +70,7 @@ def graph_three():
 	abt_throughput = [0.0023928, 0.0023928, 0.0023928, 0.0023928, 0.0023928]
 	plt.plot(wsize, abt_throughput, marker='D', color='r', label='ABT')
 	# Y-axis (GBN)
-	gbn_throughput = [0.0154164, 0.0029316, 0.0032048, 0.0030818, 0]
+	gbn_throughput = [0.0154164, 0.0029316, 0.0032048, 0.0030818, 0.0030682]
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
 	#sr_throughput = [0.0001821, 0.0001964, 0.0001618, 0.0001414, 0.0001474]

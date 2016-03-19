@@ -12,7 +12,7 @@
 /**
  * Packet timeout every X time units.
  */
-#define PKT_TIMEOUT 15.0
+#define PKT_TIMEOUT 12.5
 
 /**
  * A packet timer.
