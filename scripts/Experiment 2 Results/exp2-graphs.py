@@ -12,18 +12,18 @@ def graph_one():
 	abt_throughput = [0.0150863, 0.0150863, 0.0150863, 0.0150863, 0.0150863]
 	plt.plot(wsize, abt_throughput, marker='D', color='r', label='ABT')
 	# Y-axis (GBN)
-	gbn_throughput = [0.0200554, 0.0200554, 0.0200554, 0.0200554, 0.020299]
+	gbn_throughput = [0.0200554, 0.0200554, 0.0200554, 0.0200554, 0.0200554]
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
-	#sr_throughput = [0.0001821, 0.0001964, 0.0001618, 0.0001414, 0.0001474]
-	#plt.plot(loss, sr_throughput, marker='D', color='b', label='SR')
+	sr_throughput = [0.0198595, 0.0198595, 0.0198595, 0.0198595, 0.0198595]
+	plt.plot(wsize, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Window Size (packets)')
 	plt.ylabel('Throughput (packets/time unit)')
 	# Legend
 	plt.legend()
 	# Set Y-axis range
-	plt.ylim([0,.05])
+	plt.ylim([.01,.03])
 	# Title
 	plt.title('Throughput vs. Window Size\n(with loss probability 0.2, corruption probability 0.2, 1000 messages sent)')
 	# Show plot
@@ -44,8 +44,8 @@ def graph_two():
 	gbn_throughput = [0.0185386, 0.0186728, 0.0187064, 0.0186839, 0.0186914]
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
-	#sr_throughput = [0.0001821, 0.0001964, 0.0001618, 0.0001414, 0.0001474]
-	#plt.plot(loss, sr_throughput, marker='D', color='b', label='SR')
+	sr_throughput = [0.0198595, 0.020223, 0.020223, 0.020223, 0.020223]
+	plt.plot(wsize, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Window Size (packets)')
 	plt.ylabel('Throughput (packets/time unit)')
@@ -73,15 +73,15 @@ def graph_three():
 	gbn_throughput = [0.0154164, 0.0029316, 0.0032048, 0.0030818, 0.0030682]
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
-	#sr_throughput = [0.0001821, 0.0001964, 0.0001618, 0.0001414, 0.0001474]
-	#plt.plot(loss, sr_throughput, marker='D', color='b', label='SR')
+	sr_throughput = [0.0154164, 0.0087984, 0.008518, 0.0087438, 0.0087417]
+	plt.plot(wsize, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Window Size (packets)')
 	plt.ylabel('Throughput (packets/time unit)')
 	# Legend
 	plt.legend()
 	# Set Y-axis range
-	plt.ylim([0,.05])
+	plt.ylim([0,.02])
 	# Title
 	plt.title('Throughput vs. Window Size\n(with loss probability 0.8, corruption probability 0.2, 1000 messages sent)')
 	# Show plot
