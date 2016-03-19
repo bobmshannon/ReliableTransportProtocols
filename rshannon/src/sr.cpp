@@ -6,7 +6,7 @@
 #include <iterator>
 #include <algorithm>
 
-#define DEBUG_MODE 1 // Whether debugging mode is enabled or disabled
+#define DEBUG_MODE 0 // Whether debugging mode is enabled or disabled
 #define DEBUG(x)                                                               \
   do {                                                                         \
     if (DEBUG_MODE) {                                                          \
