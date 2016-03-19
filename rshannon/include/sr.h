@@ -41,7 +41,7 @@ void pkt_timer_interrupt_handler(int seq_num);
 void fire_expired_pkt_timers();
 
 /**
- * The maximum amount of packets that the sender store in
+ * The maximum amount of packets that can be stored in
  * a single buffer.
  */
 #define MAX_BUF_SIZE 1024
@@ -71,13 +71,32 @@ void add_to_unsent_buf(struct pkt packet);
 void add_to_unacked_buf(struct pkt packet);
 bool sort_by_seq(const pkt& a, const pkt& b);
 
+/**
+ * Buffer which stores out of order packets on receiver side.
+ */
 std::vector<pkt> recv_buf;
+
+/**
+ * Selective-Repeat protocol book-keeping variables.
+ */
 int send_base;
 int next_seq_num;
 int window_size;
 int recv_base;
 
+/**
+ * Send a packet through the network.
+ * 
+ * @param caller 0 for A, 1 for B
+ * @param packet the packet to send
+ */
 void send_pkt(int caller, struct pkt packet);
+
+/**
+ * Re-send an unacknowledged packet.
+ * 
+ * @param seq_num the sequence number of the unacknowledged packet to re-send
+ */
 void resend_pkt(int seq_num);
 
 #endif

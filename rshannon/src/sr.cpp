@@ -22,11 +22,11 @@
 void new_pkt_timer(int seq_num) {
 	if(pkt_timers.size() > MAX_NO_TIMERS) {
 		// Too many active timers.
-		//DEBUG("packet timer: could not create a new timer for seq " << seq_num << " bececause there are too many timers currently running");
+		DEBUG("packet timer: could not create a new timer for seq " << seq_num << " bececause there are too many timers currently running");
 		return;
 	}
 	if(pkt_timer_exists(seq_num)) {
-		//DEBUG("packet timer: could not create new timer for seq " << seq_num << " because one already exists.");
+		DEBUG("packet timer: could not create new timer for seq " << seq_num << " because one already exists.");
 		return;		
 	}
 	// Construct packet timer.
@@ -46,7 +46,7 @@ void new_pkt_timer(int seq_num) {
 void start_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
-			//DEBUG("packet timer: starting timer for seq " << seq_num << " | next fire at " << get_sim_time() + PKT_TIMEOUT);
+			DEBUG("packet timer: starting timer for seq " << seq_num << " | next fire at " << get_sim_time() + PKT_TIMEOUT);
 			pkt_timers[i].active = true;
 			pkt_timers[i].next_fire = get_sim_time() + PKT_TIMEOUT;
 			break;
@@ -62,7 +62,7 @@ void start_pkt_timer(int seq_num) {
 void stop_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
-			//DEBUG("packet timer: stopping timer for seq " << seq_num);
+			DEBUG("packet timer: stopping timer for seq " << seq_num);
 			pkt_timers[i].active = false;
 			break;
 		}
@@ -77,7 +77,7 @@ void stop_pkt_timer(int seq_num) {
 void destroy_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
-			//DEBUG("packet timer: destroyed timer for seq " << seq_num);
+			DEBUG("packet timer: destroyed timer for seq " << seq_num);
 			pkt_timers.erase(pkt_timers.begin()+i);
 			break;
 		}
@@ -92,7 +92,7 @@ void destroy_pkt_timer(int seq_num) {
 void fire_pkt_timer(int seq_num) {
 	for(int i = 0; i < pkt_timers.size(); i++) {
 		if(pkt_timers[i].seq_num == seq_num) {
-			//DEBUG("packet timer: timer for seq " << seq_num << " fired" << " because next_fire_time was " << pkt_timers[i].next_fire);
+			DEBUG("packet timer: timer for seq " << seq_num << " fired" << " because next_fire_time was " << pkt_timers[i].next_fire);
 			pkt_timers[i].active = false;
 			pkt_timer_interrupt_handler(seq_num);
 		}
@@ -127,10 +127,10 @@ void pkt_timer_interrupt_handler(int seq_num) {
  * @param seq_num The sequence number of the packet to resend
  */
 void resend_pkt(int seq_num) {
-	//DEBUG("sender: unacked buf size " << unacked_buf.size());
+	DEBUG("sender: unacked buf size " << unacked_buf.size());
 	for(std::deque<pkt>::iterator it = unacked_buf.begin(); it != unacked_buf.end(); ) {
 		if((*it).seqnum == seq_num) {
-			//DEBUG("sender: re-sending packet due to timeout... | seq " << (*it).seqnum);
+			DEBUG("sender: re-sending packet due to timeout... | seq " << (*it).seqnum);
 			send_pkt(0, (*it));
 		}
 		it++;
@@ -170,6 +170,15 @@ pkt make_pkt(int seqnum, int acknum, struct msg message) {
   return packet;
 }
 
+/**
+ * Construct an ACK. This differs from make_pkt
+ * in that it does not create a new packet timer.
+ * 
+ * @param  seqnum the sequence number of the packet
+ * @param  acknum the ack number of the packet
+ * @param  data   the packet payload
+ * @return        an ACK packet with calculated checksum
+ */
 pkt make_ack_pkt(int seqnum, int acknum) {
   struct pkt packet = {}; // Initialize packet and zero fill members
   struct msg ack_msg = {};
@@ -189,7 +198,7 @@ pkt make_ack_pkt(int seqnum, int acknum) {
 void send_pkt(int caller, struct pkt packet) {
   // Send packet to receiver
   tolayer3(caller, packet);
-  //DEBUG("sender: packet sent | seq " << packet.seqnum);
+  DEBUG("sender: packet sent | seq " << packet.seqnum);
   // Start packet timer
   start_pkt_timer(packet.seqnum);
 }
@@ -235,6 +244,11 @@ bool is_corrupt(struct pkt packet) {
 	return false;
 }
 
+/**
+ * Add unacknowledged packet to buffer.
+ * 
+ * @param packet the unacknowledged packet
+ */
 void add_to_unacked_buf(struct pkt packet) {
 	if(unacked_buf.size() == MAX_BUF_SIZE) {
 		// Enforce maximum buffer size of MAX_BUF_SIZE
@@ -242,11 +256,16 @@ void add_to_unacked_buf(struct pkt packet) {
 		unacked_buf.pop_back();
 	}
 	// Queue packet
-	//DEBUG("sender: adding packet " << packet.seqnum << " to unacked buffer");
+	DEBUG("sender: adding packet " << packet.seqnum << " to unacked buffer");
 	unacked_buf.push_back(packet);
-	//DEBUG("sender: unacked buffer has size " << unacked_buf.size());
+	DEBUG("sender: unacked buffer has size " << unacked_buf.size());
 }
 
+/**
+ * Add unsent packet to buffer.
+ * 
+ * @param packet the unsent packet
+ */
 void add_to_unsent_buf(struct pkt packet) {
 	if(unsent_buf.size() == MAX_BUF_SIZE) {
 		// Enforce maximum buffer size of MAX_BUF_SIZE
@@ -254,12 +273,17 @@ void add_to_unsent_buf(struct pkt packet) {
 		unsent_buf.pop_front();
 	}
 	// Queue packet
-	//DEBUG("sender: adding packet " << packet.seqnum << " to unsent buffer");
+	DEBUG("sender: adding packet " << packet.seqnum << " to unsent buffer");
 	unsent_buf.push_back(packet);
-	//DEBUG("sender: unsent buffer has size " << unsent_buf.size());
+	DEBUG("sender: unsent buffer has size " << unsent_buf.size());
 }
 
-/* called from layer 5, passed the data to be sent to other side */
+/**
+ * Called when an application has a message ready to sent
+ * out through the network.
+ * 
+ * @param message the message to send
+ */
 void A_output(struct msg message)
 {
 	struct pkt packet = make_pkt(next_seq_num, 0, message);
@@ -274,14 +298,18 @@ void A_output(struct msg message)
 	next_seq_num++;
 }
 
-/* called from layer 3, when a packet arrives for layer 4 */
+/**
+ * Called when host A received a packet from the network.
+ * 
+ * @param packet the packet received from the network
+ */
 void A_input(struct pkt packet)
 {
 	if(is_corrupt(packet)) {
-		//DEBUG("sender: received corrupted ack packet, ignoring...");
+		DEBUG("sender: received corrupted ack packet, ignoring...");
 		return;
 	}
-	//DEBUG("sender: received ack " << packet.acknum);
+	DEBUG("sender: received ack " << packet.acknum);
 
 	// Update send_base
 	std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
@@ -291,8 +319,7 @@ void A_input(struct pkt packet)
 		} else {
 			send_base++;
 		}
-	}
-	//send_base = unacked_buf[0].seqnum;	
+	}	
 	DEBUG("BASE updated to " << send_base);	
 
 	// Mark packet as received
@@ -321,23 +348,21 @@ void A_input(struct pkt packet)
 		// Buffer unacknowledged packet
 		add_to_unacked_buf(packet);
 	}
-
-	// Update window base
-	if(packet.acknum == send_base) {
-		//std::sort(unacked_buf.begin(), unacked_buf.end(), sort_by_seq);
-		//send_base = unacked_buf[0].seqnum;	
-		//DEBUG("BASE updated to " << send_base);	
-
-
-	}
-	//send_base++;
 }
 
+/**
+ * Custom comparator. Sorts packets by sequence number,
+ * from smallest to highest. Used with std::sort.
+ */
 bool sort_by_seq(const pkt& a, const pkt& b) {
     return a.seqnum < b.seqnum;
 }
 
-/* called when A's timer goes off */
+/**
+ * Called whenever a "hardware" timer interrupt occurs.
+ * (Note that within a simulated environment like this 
+ * there is no true hardware timer present.)
+ */
 void A_timerinterrupt() {
 	// Fire all expired packet timers
 	fire_expired_pkt_timers();
@@ -346,8 +371,9 @@ void A_timerinterrupt() {
   	starttimer(0, 1.0);
 }  
 
-/* the following routine will be called once (only) before any other */
-/* entity A routines are called. You can use it to do any initialization */
+/**
+ * Initialization for sender once simulation begins.
+ */
 void A_init()
 {
 	send_base = 1;
@@ -357,11 +383,14 @@ void A_init()
   	starttimer(0, 1.0);
 }
 
-/* Note that with simplex transfer from a-to-B, there is no B_output() */
-
-/* called from layer 3, when a packet arrives for layer 4 at B*/
+/**
+ * Called when a packet arrives at host B from the network.
+ * 
+ * @param packet the packet from the network
+ */
 void B_input(struct pkt packet)
 {
+	// Check if packet is corrupt
 	if(is_corrupt(packet)) {
 		DEBUG("receiver: packet received but corrupted");
 		return;
@@ -378,37 +407,37 @@ void B_input(struct pkt packet)
 		}
 	}
 
+	// Packet is within receiver window
 	if(packet.seqnum >= recv_base && packet.seqnum < recv_base + window_size) {
 		// Send acknowledgement
 		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
 		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
 		tolayer3(1, ack_pkt);
 
-		// packet is within receiver window
 		if(packet.seqnum == recv_base) {
-			// buffer received packet
+			// Buffer received packet
 			recv_buf.push_back(packet);
-			// deliver in order packets starting from recv_base
+			// Deliver in order packets starting from recv_base
 			int num_delivered = 0;
 			std::sort(recv_buf.begin(), recv_buf.end(), sort_by_seq);
 			for(int i = 0; i < recv_buf.size(); i++) {
 				if(i == 0) { 
 					DEBUG("receiver: delivering packet " << recv_buf[i].seqnum);
-					// deliver packet
+					// Deliver packet
 					tolayer5(1, recv_buf[i].payload);
-					// advance recv_base by number of packets delivered
+					// Advance recv_base by number of packets delivered
 					recv_base++;
-					// advance num_delivered
+					// Advance num_delivered
 					num_delivered++;
 					continue; 
 				}
 				if(recv_buf[i-1].seqnum+1 == recv_buf[i].seqnum) { 
 					DEBUG("receiver: delivering packet " << recv_buf[i].seqnum);
-					// deliver packet
+					// Deliver packet
 					tolayer5(1, recv_buf[i].payload);
-					// advance recv_base by number of packets delivered
+					// Advance recv_base by number of packets delivered
 					recv_base++;
-					// advance num_delivered
+					// Advance num_delivered
 					num_delivered++;
 					continue;
 				} else {
@@ -416,45 +445,23 @@ void B_input(struct pkt packet)
 				}
 			}
 
+			// Remove delivered packets from receiver buffer
 			recv_buf.erase(recv_buf.begin(), recv_buf.begin()+num_delivered);
-
-			/*for(int i = 0; i < recv_buf.size(); i++) {
-				if(i == 0) { continue; }
-				if(recv_buf[i-1].seqnum+1 != recv_buf[i].seqnum) {
-					last = i - 1;
-					break;
-				} else {
-					last = i;
-				}
-			}
-			for(int i = 0; i <= last; i++) {
-				DEBUG("receiver: delivering packet " << recv_buf[i].seqnum);
-				// deliver packet
-				tolayer5(1, recv_buf[i].payload);
-				// advance recv_base by number of packets delivered
-				recv_base++;
-			}
-			// clear recv buf
-			if(recv_buf.size() > 0) {
-				if(last == 0) { recv_buf.erase(recv_buf.begin()); }
-				else { recv_buf.erase(recv_buf.begin(), recv_buf.begin()+last+1); }
-			}*/
-
 		} else {
-			// buffer out of order packet
+			// Buffer out of order packet
 			DEBUG("receiver: buffering out of order packet " << packet.seqnum);
 			recv_buf.push_back(packet);
 		}
-	} //else if (packet.seqnum >= recv_base-window_size && packet.seqnum < recv_base) {
-		// Send acknowledgement
-		struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
-		DEBUG("receiver: packet received, sending ack " << packet.seqnum);
-		send_pkt(1, ack_pkt);
-	//}
+	}
+	// Send acknowledgement
+	struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
+	DEBUG("receiver: packet received, sending ack " << packet.seqnum);
+	send_pkt(1, ack_pkt);
 }
 
-/* the following rouytine will be called once (only) before any other */
-/* entity B routines are called. You can use it to do any initialization */
+/**
+ * Initialization for receiver once simulation begins.
+ */
 void B_init()
 {
 	recv_base = 1;
