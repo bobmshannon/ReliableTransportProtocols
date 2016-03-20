@@ -16,6 +16,7 @@ def graph_one():
 	plt.plot(loss, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
 	#sr_throughput = [0.0198723, 0.0198595, 0.0195746, 0.0116579, 0.0128253]
+	#sr_throughput = [0.0199841, 0.0197506, 0.0199068, 0.0165002, 0.0166585]
 	sr_throughput = [0.0199841, 0.0197506, 0.0199068, 0.0165002, 0.0166585]
 	plt.plot(loss, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
@@ -47,6 +48,7 @@ def graph_two():
 	plt.plot(loss, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
 	#sr_throughput = [0.0198723, 0.0198595, 0.0199804, 0.0201327, 0.0087984]
+	#sr_throughput = [0.0199841, 0.0197506, 0.0201053, 0.0199364, 0.0104501]
 	sr_throughput = [0.0199841, 0.0197506, 0.0201053, 0.0199364, 0.0104501]
 	plt.plot(loss, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
@@ -60,5 +62,5 @@ def graph_two():
 	plt.title('Throughput vs. Loss Probability\n(with window size 50, corruption probability 0.2, 1000 messages sent)')
 	plt.show()
 
-graph_one()
-#graph_two()
+#graph_one()
+graph_two()
