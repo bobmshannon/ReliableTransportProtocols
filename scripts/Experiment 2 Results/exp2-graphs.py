@@ -15,7 +15,8 @@ def graph_one():
 	gbn_throughput = [0.0200554, 0.0200554, 0.0200554, 0.0200554, 0.0200554]
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
-	sr_throughput = [0.0198595, 0.0198595, 0.0198595, 0.0198595, 0.0198595]
+	#sr_throughput = [0.0198595, 0.0198595, 0.0198595, 0.0198595, 0.0198595]
+	sr_throughput = [0.0197506, 0.0197506, 0.0197506, 0.0197506, 0.0197506]
 	plt.plot(wsize, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Window Size (packets)')
@@ -87,6 +88,6 @@ def graph_three():
 	# Show plot
 	plt.show()
 
-#graph_one()
+graph_one()
 #graph_two()
-graph_three()
+#graph_three()
