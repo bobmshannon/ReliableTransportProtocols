@@ -203,7 +203,7 @@ The timeout interval (how long a protocol waits before resending unacknowledged 
 \begin{enumerate}
     \item \textbf{Alternating Bit (ABT)} --- $t=10.0$, re-send unacknowledged packet after 10.0 time units.
     \item \textbf{Go-Back-N (GBN)} --- $t=11.0$, re-send all unacknowledged packets after 11.0 time units.
-    \item \textbf{Selective-Repeat (SR)} --- $t=12.5$, re-send unacknowledged packet after 12.5 time units. Note that SR uses an individual timer for each unacknowledged packet.
+    \item \textbf{Selective-Repeat (SR)} --- $t=15.0$, re-send unacknowledged packet after 15.0 time units. Note that SR uses an individual timer for each unacknowledged packet.
 \end{enumerate}
 
 All of the timeout values are very close (or equal to in the case of ABT) to the link's average RTT. This is because the average RTT is the expected amount of time to receive an ACK after sending a packet. If an ACK is not received within 1 RTT, it is assumed that the corresponding packet or the ACK itself were either lost or corrupted, and as a result needs to be re-sent.
