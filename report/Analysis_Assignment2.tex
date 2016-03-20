@@ -222,9 +222,9 @@ In each of the experiments below, the protocols were tested by sending 1,000 mes
 
 \textbf{Expected}: Throughput to decrease as loss probability increases. Similar throughput performance of both SR and GBN (with SR utilizing the link more efficiently). Inferior throughput performance of ABT when compared to SR and GBN across a wide range of loss probabilities. 
 \newline\newline
-\textbf{Observed}: Increasing loss probability lowers throughput. The maximum throughput of both SR and GBN are about equal with this window size. SR's throughput drops lower than that of GBN's at a loss probability $l\ge0.4$. Both SR and GBN maintain their maximum throughput through $0.1 \le l \le 0.4$, while ABT's throughput drops consistently as loss probability is increased.
+\textbf{Observed}: Increasing loss probability lowers throughput. The maximum throughput of both SR and GBN are about equal with this window size. SR's throughput drops lower than that of GBN's at a loss probability at roughly $l\ge0.6$. Both SR and GBN maintain their maximum throughput through $0.1 \le l \le 0.4$, while ABT's throughput drops consistently as loss probability is increased.
 \newline\newline
-\textbf{Conclusion}: Increased packet loss decreases throughput. SR and GBN appear to be more resilient to packet loss than ABT.
+\textbf{Conclusion}: Increased packet loss eventually decreases throughput. SR and GBN appear to be more resilient to packet loss than ABT.
 
 \pagebreak
 
@@ -238,7 +238,7 @@ In each of the experiments below, the protocols were tested by sending 1,000 mes
 \newline\newline
 \textbf{Observed}: Throughput drops with $t\ge0.6$ for SR, and $t\ge0.4$ for GBN. SR can maintain maximum throughput with up to 60\% packet loss, while GBN can only do so with up to 40\% packet loss. SR has a throughput that is consistently greater than or equal to that of GBN. ABT is again outperformed by both GBN and SR under all packet loss scenarios.
 \newline\newline
-\textbf{Conclusion}: The larger window size did not result in more throughput, likely because the sender was not sending messages fast enough to fill the pipeline. Interestingly, increasing the window size made SR more resilient to packet loss while maintaining maximum throughput. With a larger window size, SR at least matches or outperforms GBN in terms of throughput at most levels of packet loss.
+\textbf{Conclusion}: The larger window size did not result in more throughput, likely because the sender was not sending messages fast enough to fill the pipeline. Interestingly, increasing the window size made SR more resilient to packet loss while maintaining maximum throughput. SR at least matches or outperforms GBN in terms of throughput at most levels of packet loss.
 
 \pagebreak
 
