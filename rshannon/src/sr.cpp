@@ -461,11 +461,13 @@ void B_input(struct pkt packet) {
       DEBUG("receiver: buffering out of order packet " << packet.seqnum);
       recv_buf.push_back(packet);
     }
+  } else if(packet.seqnum < recv_base) {
+    // Send acknowledgement
+    struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
+    DEBUG("receiver: packet received, sending ack " << packet.seqnum);
+    send_pkt(1, ack_pkt);
   }
-  // Send acknowledgement
-  struct pkt ack_pkt = make_ack_pkt(packet.seqnum, packet.seqnum);
-  DEBUG("receiver: packet received, sending ack " << packet.seqnum);
-  send_pkt(1, ack_pkt);
+
 }
 
 /**

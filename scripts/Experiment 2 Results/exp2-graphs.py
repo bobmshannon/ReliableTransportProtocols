@@ -45,7 +45,8 @@ def graph_two():
 	gbn_throughput = [0.0185386, 0.0186728, 0.0187064, 0.0186839, 0.0186914]
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
-	sr_throughput = [0.0198595, 0.020223, 0.020223, 0.020223, 0.020223]
+	#sr_throughput = [0.0198595, 0.020223, 0.020223, 0.020223, 0.020223]
+	sr_throughput = [0.0142709, 0.0199106, 0.0199106, 0.0199106, 0.0199106]
 	plt.plot(wsize, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Window Size (packets)')
@@ -74,7 +75,9 @@ def graph_three():
 	gbn_throughput = [0.0154164, 0.0029316, 0.0032048, 0.0030818, 0.0030682]
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
-	sr_throughput = [0.0154164, 0.0087984, 0.008518, 0.0087438, 0.0087417]
+	#sr_throughput = [0.0154164, 0.0087984, 0.008518, 0.0087438, 0.0087417]
+	## TODO: finish last window size 500 experiment...
+	sr_throughput = [0.0166585, 0.0104501, 0.0090598, 0.0093466, 0.0093466]
 	plt.plot(wsize, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Window Size (packets)')
@@ -88,6 +91,6 @@ def graph_three():
 	# Show plot
 	plt.show()
 
-graph_one()
+#graph_one()
 #graph_two()
-#graph_three()
+graph_three()
