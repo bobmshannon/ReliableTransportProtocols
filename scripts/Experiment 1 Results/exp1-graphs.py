@@ -60,5 +60,5 @@ def graph_two():
 	plt.title('Throughput vs. Loss Probability\n(with window size 50, corruption probability 0.2, 1000 messages sent)')
 	plt.show()
 
-#graph_one()
-graph_two()
+graph_one()
+#graph_two()
