@@ -278,7 +278,7 @@ In each of the experiments below, the protocols were tested by sending 1,000 mes
 
 \textbf{Expected}: Constant throughput for each protocol, but lower than than that of experiment (2b) due to increased packet loss.
 \newline\newline
-\textbf{Observed}: Constant throughput for ABT. Large drop of throughput for both GBN and SR with window size $\ge 10$, which stablizes with window size $\ge 50$. SR decisvely outperforms GBN in terms of throughput with window size $\ge 50$. Window size 10 offers the most throughput under this high packet loss scenario.
+\textbf{Observed}: Constant throughput for ABT. Large drop of throughput for both GBN and SR with window size $\ge 10$. SR decisvely outperforms GBN in terms of throughput with window size $\ge 50$. Window size 10 offers the most throughput under this high packet loss scenario.
 \newline\newline
 \textbf{Conclusion}: The throughput of SR is more resilient than GBN and ABT under conditions of high packet loss. There exists an optimal window size for each protocol that maximizes throughput with a certain level of packet loss, in this case it is 10.
 
@@ -291,6 +291,6 @@ In each of the experiments below, the protocols were tested by sending 1,000 mes
     \item The throughput of SR is more resilient to packet loss than both GBN and ABT.
     \item Under ideal conditions ($l=0.0, c=0.0$) a larger window size will increase throughput only if an application sends messages fast enough to fill the window.
     \item There exists an optimal window size that maximizes throughput under most packet loss conditions. Based on the experiments conducted, a window size of 50 would be a good choice for both SR and GBN. This window size allows for the most throughput under the most diverse range of conditions, while keeping memory usage on each endpoint minimal. However, this window size is optimal only in this specific scenario where the application is sending messages every 50 time units. In reality, this rate will be unpredictable. This suggests that it might be useful to potentially look into designing a new protocol based off SR or GBN that has a window size ``auto-tuning'' feature to maximize performance based on the sending rate of the application.
-    \item From (1-5) SR is the protocol which offers the most throughput under the most diverse range of conditions, and is the most superior protocol in terms of performance.
+    \item From (1-5) SR is the protocol which offers the most throughput under the most diverse range of conditions, and is the more superior protocol in terms of performance.
 \end{enumerate}
 \end{document}
