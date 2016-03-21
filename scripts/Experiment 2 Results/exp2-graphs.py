@@ -76,7 +76,7 @@ def graph_three():
 	plt.plot(wsize, gbn_throughput, marker='D', color='g', label='GBN')
 	# Y-axis (SR)
 	#sr_throughput = [0.0154164, 0.0087984, 0.008518, 0.0087438, 0.0087417]
-	sr_throughput = [0.0166585, 0.0104501, 0.0090598, 0.0093466, 0.0060229]
+	sr_throughput = [0.0166585, 0.0104501, 0.0090598, 0.0093466, 0.0030682]
 	plt.plot(wsize, sr_throughput, marker='D', color='b', label='SR')
 	# Axis labels
 	plt.xlabel('Window Size (packets)')
